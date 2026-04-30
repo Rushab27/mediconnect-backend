@@ -4,7 +4,7 @@ const pool = require('../config/database');
 
 // ─── CLINIC SIGNUP ───────────────────────────────────────────────
 const clinicSignup = async (req, res) => {
-  const { clinic_name, email, password, phone, address, city, specialization } = req.body;
+  const { name, email, password, phone, address, city, specialization } = req.body;
 
   try {
     // Check if email already exists
@@ -23,10 +23,10 @@ const clinicSignup = async (req, res) => {
 
     // Insert clinic into database
     const result = await pool.query(
-      `INSERT INTO clinics (clinic_name, email, password, phone, address, city, specialization)
+      `INSERT INTO clinics (name, email, password, phone, address, city, specialization)
        VALUES ($1, $2, $3, $4, $5, $6, $7)
-       RETURNING id, clinic_name, email, phone, city`,
-      [clinic_name, email, hashedPassword, phone, address, city, specialization || null]
+       RETURNING id, name, email, phone, city`,
+      [name, email, hashedPassword, phone, address, city, specialization || null]
     );
 
     const clinic = result.rows[0];
@@ -44,7 +44,7 @@ const clinicSignup = async (req, res) => {
       token,
       clinic: {
         id: clinic.id,
-        clinic_name: clinic.clinic_name,
+        name: clinic.name,
         email: clinic.email,
         phone: clinic.phone,
         city: clinic.city
@@ -101,7 +101,7 @@ const clinicLogin = async (req, res) => {
       token,
       clinic: {
         id: clinic.id,
-        clinic_name: clinic.clinic_name,
+        name: clinic.name,
         email: clinic.email,
         phone: clinic.phone,
         city: clinic.city,
@@ -123,7 +123,7 @@ const clinicLogin = async (req, res) => {
 const getClinicProfile = async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT id, clinic_name, email, phone, address, city, specialization, 
+      `SELECT id, name, email, phone, address, city, specialization, 
               whatsapp_number, created_at
        FROM clinics WHERE id = $1`,
       [req.user.clinic_id]
@@ -143,12 +143,12 @@ const getClinicProfile = async (req, res) => {
 
 // ─── UPDATE CLINIC PROFILE ────────────────────────────────────────
 const updateClinicProfile = async (req, res) => {
-  const { clinic_name, phone, address, city, specialization, whatsapp_number } = req.body;
+  const { name, phone, address, city, specialization, whatsapp_number } = req.body;
 
   try {
     const result = await pool.query(
       `UPDATE clinics 
-       SET clinic_name = COALESCE($1, clinic_name),
+       SET name = COALESCE($1, name),
            phone = COALESCE($2, phone),
            address = COALESCE($3, address),
            city = COALESCE($4, city),
@@ -156,8 +156,8 @@ const updateClinicProfile = async (req, res) => {
            whatsapp_number = COALESCE($6, whatsapp_number),
            updated_at = NOW()
        WHERE id = $7
-       RETURNING id, clinic_name, email, phone, address, city, specialization, whatsapp_number`,
-      [clinic_name, phone, address, city, specialization, whatsapp_number, req.user.clinic_id]
+       RETURNING id, name, email, phone, address, city, specialization, whatsapp_number`,
+      [name, phone, address, city, specialization, whatsapp_number, req.user.clinic_id]
     );
 
     return res.status(200).json({
