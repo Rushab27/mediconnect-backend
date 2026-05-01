@@ -173,3 +173,5 @@ const updateClinicProfile = async (req, res) => {
 };
 
 module.exports = { clinicSignup, clinicLogin, getClinicProfile, updateClinicProfile };
+
+/* /index.html 200
